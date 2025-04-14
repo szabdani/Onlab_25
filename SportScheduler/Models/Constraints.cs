@@ -7,6 +7,11 @@ using System.Xml.Serialization;
 
 namespace SportScheduler.Models
 {
+	// Constraint type: HARD & SOFT
+	// HARD: can not be violated
+	// SOFT: incurs a penalty
+	// Penalties: Summed over all SOFT constraints.
+	// Each constraint has "penalty" which is the weight that the penalty will be multiplied with
 	public class Constraints
 	{
 		[XmlElement("CapacityConstraints")]
@@ -68,10 +73,14 @@ namespace SportScheduler.Models
 		public List<FA2> FA2s { get; set; }
 	}
 
+	// "Team" plays at most "Max" games in "Slots"
+	// Mode = H -> Max Home games
+	// Mode = A -> Max Away games
+	// Penalty given for each game that exceeds "Max"
 	public class CA1
 	{
 		[XmlAttribute("teams")]
-		public int Teams { get; set; }
+		public int Team { get; set; }
 
 		[XmlAttribute("max")]
 		public int Max { get; set; }
@@ -99,10 +108,15 @@ namespace SportScheduler.Models
 		public int Penalty { get; set; }
 	}
 
+	// "Team1" plays at most "Max" games against "Teams2" in "Slots"
+	// Mode1 = H -> Max Home games
+	// Mode1 = A -> Max Away games
+	// Mode1 = HA -> All games
+	// Penalty given for each game that exceeds "Max"
 	public class CA2
 	{
 		[XmlAttribute("teams1")]
-		public int Teams1 { get; set; }
+		public int Team1 { get; set; }
 
 		[XmlAttribute("teams2")]
 		public string Teams2Raw
@@ -123,6 +137,7 @@ namespace SportScheduler.Models
 		[XmlAttribute("mode1")]
 		public string Mode1 { get; set; }
 
+		// Always 'GLOBAL', no need to process
 		[XmlAttribute("mode2")]
 		public string Mode2 { get; set; }
 
@@ -142,6 +157,12 @@ namespace SportScheduler.Models
 		[XmlAttribute("penalty")]
 		public int Penalty { get; set; }
 	}
+
+	// Each team in "Teams1" plays at most "Max" games out of "intp" against "Teams2"
+	// Mode1 = H -> Max Home games
+	// Mode1 = A -> Max Away games
+	// Mode1 = HA -> All games
+	// Penalty is the sum of the games that exceed "Max" for each "Teams1"
 	public class CA3
 	{
 		[XmlAttribute("teams1")]
@@ -176,18 +197,9 @@ namespace SportScheduler.Models
 		[XmlAttribute("intp")]
 		public int Intp { get; set; }
 
+		// Always 'SLOTS', no need to process
 		[XmlAttribute("mode2")]
 		public string Mode2 { get; set; }
-
-		[XmlAttribute("slots")]
-		public string SlotsRaw
-		{
-			get => string.Join(";", Slots);
-			set => Slots = value.Split(';').Select(s => int.Parse(s)).ToList();
-		}
-
-		[XmlIgnore]
-		public List<int> Slots { get; set; } = new();
 
 		[XmlAttribute("type")]
 		public string Type { get; set; }
@@ -195,6 +207,15 @@ namespace SportScheduler.Models
 		[XmlAttribute("penalty")]
 		public int Penalty { get; set; }
 	}
+
+
+	// "Teams1" plays at most "Max" games against "Teams2 as a whole"
+	// Mode1 = H -> Max Home games
+	// Mode1 = A -> Max Away games
+	// Mode1 = HA -> All games
+	// Mode2 = GLOBAL -> During "Slots"
+	// Mode2 = EVERY -> During each slot in "Slots"
+	// Penalty is given for each game that exceeds "Max"
 	public class CA4
 	{
 		[XmlAttribute("teams1")]
@@ -247,75 +268,9 @@ namespace SportScheduler.Models
 		public int Penalty { get; set; }
 	}
 
-	public class BR1
-	{
-		[XmlAttribute("teams")]
-		public int Teams { get; set; }
-
-		[XmlAttribute("mode1")]
-		public string Mode1 { get; set; }
-
-		[XmlAttribute("intp")]
-		public int Intp { get; set; }
-
-		[XmlAttribute("mode2")]
-		public string Mode2 { get; set; }
-
-		[XmlAttribute("slots")]
-		public string SlotsRaw
-		{
-			get => string.Join(";", Slots);
-			set => Slots = value.Split(';').Select(s => int.Parse(s)).ToList();
-		}
-
-		[XmlIgnore]
-		public List<int> Slots { get; set; } = new();
-
-		[XmlAttribute("type")]
-		public string Type { get; set; }
-
-		[XmlAttribute("penalty")]
-		public int Penalty { get; set; }
-	}
-
-	public class BR2
-	{
-		[XmlAttribute("teams")]
-		public string TeamsRaw
-		{
-			get => string.Join(";", Teams);
-			set => Teams = value.Split(';').Select(s => int.Parse(s)).ToList();
-		}
-
-		[XmlIgnore]
-		public List<int> Teams { get; set; } = new();
-
-		[XmlAttribute("homeMode")]
-		public string HomeMode { get; set; }
-
-		[XmlAttribute("intp")]
-		public int Intp { get; set; }
-
-		[XmlAttribute("mode2")]
-		public string Mode2 { get; set; }
-
-		[XmlAttribute("slots")]
-		public string SlotsRaw
-		{
-			get => string.Join(";", Slots);
-			set => Slots = value.Split(';').Select(s => int.Parse(s)).ToList();
-		}
-
-		[XmlIgnore]
-		public List<int> Slots { get; set; } = new();
-
-		[XmlAttribute("type")]
-		public string Type { get; set; }
-
-		[XmlAttribute("penalty")]
-		public int Penalty { get; set; }
-	}
-
+	// Meeting:= Game between Team A and B - (a,b)
+	// At least "Min" and at most "Max" "Meetings" happen in "Slots"
+	// Penalty is given for the number of games that fail the interval 
 	public class GA1
 	{
 		[XmlAttribute("meetings")]
@@ -354,6 +309,89 @@ namespace SportScheduler.Models
 		[XmlAttribute("penalty")]
 		public int Penalty { get; set; }
 	}
+
+	// Break:= If a team plays the same home-away status as previously
+	// "Team" has at most "intp" breaks
+	// Mode2 = H -> Max Home games
+	// Mode2 = A -> Max Away games
+	// Mode2 = HA -> All games
+	// Penalty is given for each break over "intp"
+	public class BR1
+	{
+		[XmlAttribute("teams")]
+		public int Team { get; set; }
+
+		[XmlAttribute("mode1")]
+		public string Mode1 { get; set; }
+
+		[XmlAttribute("intp")]
+		public int Intp { get; set; }
+
+		[XmlAttribute("mode2")]
+		public string Mode2 { get; set; }
+
+		[XmlAttribute("slots")]
+		public string SlotsRaw
+		{
+			get => string.Join(";", Slots);
+			set => Slots = value.Split(';').Select(s => int.Parse(s)).ToList();
+		}
+
+		[XmlIgnore]
+		public List<int> Slots { get; set; } = new();
+
+		[XmlAttribute("type")]
+		public string Type { get; set; }
+
+		[XmlAttribute("penalty")]
+		public int Penalty { get; set; }
+	}
+
+	// Break:= If a team plays the same home-away status as previously
+	// The sum of breaks of all "Teams" is less than or equal to "intp"
+	// Penalty is given for each break over "intp"
+	public class BR2
+	{
+		[XmlAttribute("teams")]
+		public string TeamsRaw
+		{
+			get => string.Join(";", Teams);
+			set => Teams = value.Split(';').Select(s => int.Parse(s)).ToList();
+		}
+
+		[XmlIgnore]
+		public List<int> Teams { get; set; } = new();
+
+		// Always "HA", no need to process
+		[XmlAttribute("homeMode")]
+		public string HomeMode { get; set; }
+
+		[XmlAttribute("intp")]
+		public int Intp { get; set; }
+
+		// Always "LEQ", no need to process
+		[XmlAttribute("mode2")]
+		public string Mode2 { get; set; }
+
+		[XmlAttribute("slots")]
+		public string SlotsRaw
+		{
+			get => string.Join(";", Slots);
+			set => Slots = value.Split(';').Select(s => int.Parse(s)).ToList();
+		}
+
+		[XmlIgnore]
+		public List<int> Slots { get; set; } = new();
+
+		[XmlAttribute("type")]
+		public string Type { get; set; }
+
+		[XmlAttribute("penalty")]
+		public int Penalty { get; set; }
+	}
+
+	// Each pairing of "Teams" has a difference in home games less than or equal to "intp" after each "slot"
+	// Penalty is given for the largest difference between home games over "intp" for each team pairing
 	public class FA2
 	{
 		[XmlAttribute("teams")]
@@ -366,6 +404,7 @@ namespace SportScheduler.Models
 		[XmlIgnore]
 		public List<int> Teams { get; set; } = new();
 
+		// Always "H", no need to process
 		[XmlAttribute("mode")]
 		public string Mode { get; set; }
 
@@ -389,6 +428,8 @@ namespace SportScheduler.Models
 		public int Penalty { get; set; }
 	}
 
+	// Each pair of teams in "Teams" plays consecutive mutual games between "Min" and "Max" time slots
+	// Penalty is given for how many games each pairing exceeds the interval
 	public class SE1
 	{
 		[XmlAttribute("teams")]
@@ -401,6 +442,7 @@ namespace SportScheduler.Models
 		[XmlIgnore]
 		public List<int> Teams { get; set; } = new();
 
+		// Always "SLOTS", no need to process
 		[XmlAttribute("mode1")]
 		public string Mode1 { get; set; }
 
