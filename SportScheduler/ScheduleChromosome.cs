@@ -10,25 +10,31 @@ namespace SportScheduler
 {
 	public class ScheduleChoromosome : ChromosomeBase
 	{
-		private Instance _instance;
+		private static Instance _instance;
 
 		// Possible values: 16, 18, 20
-		private int numberOfTeams = 16;
+		private static int numberOfTeams = 16;
 
 		// How many rounds there are
 		// Possible values: 30, 34, 38
 		// Because it's always 2RR
-		private int numberOfSlots = 30;
+		private static int numberOfSlots = 30;
 
 		// Phased if the games are split into to 1RRs in the middle of the season
-		private bool isPhased = false;
+		private static bool isPhased = false;
 
-		public ScheduleChoromosome(Instance instance) : base(10)
+		public Games Games {  get; set; }
+
+		public static void SetInstance(Instance instance)
 		{
+			_instance = instance;
 			numberOfTeams = instance.Resources.Teams.Count;
 			numberOfSlots = instance.Resources.Slots.Count;
 			isPhased = instance.Structure.Format.GameMode.Equals("P");
+		}
 
+		public ScheduleChoromosome() : base(10)
+		{
 			CreateGenes();
 		}
 
@@ -41,7 +47,7 @@ namespace SportScheduler
 
 		public override IChromosome CreateNew()
 		{
-			return new ScheduleChoromosome(_instance);
+			return new ScheduleChoromosome();
 		}
 	}
 }

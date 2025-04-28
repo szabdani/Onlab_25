@@ -22,12 +22,13 @@ class Program
 		var instance = (Instance)serializer.Deserialize(reader);
 
 		Console.WriteLine("Loaded instance: " + instance.MetaData.InstanceName);
+		ScheduleChoromosome.SetInstance(instance);
 
 		var selection = new EliteSelection();
 		var crossover = new OrderedCrossover();
 		var mutation = new ReverseSequenceMutation();
 		var fitness = new ScheduleFitness(instance);
-		var chromosome = new ScheduleChoromosome(instance);
+		var chromosome = new ScheduleChoromosome();
 		var population = new Population(50, 70, chromosome);
 
 		var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
@@ -36,7 +37,7 @@ class Program
 		Console.WriteLine("GA running...");
 		ga.Start();
 
-		Console.WriteLine("Best solution found has {0} fitness.", ga.BestChromosome.Fitness);
+		Console.WriteLine($"Best solution found has {0} fitness.", ga.BestChromosome.Fitness);
 	}
 }
 
