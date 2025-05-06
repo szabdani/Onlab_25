@@ -217,7 +217,7 @@ namespace SportScheduler.Models
 	}
 
 	/// <summary>
-	// "Teams1" plays at most "Max" games against "Teams2 as a whole"
+	/// "Teams1" plays at most "Max" games against "Teams2 as a whole"
 	/// Mode1 = H -> Max Home games
 	/// Mode1 = A -> Max Away games
 	/// Mode1 = HA -> All games

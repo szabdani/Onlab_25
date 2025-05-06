@@ -33,10 +33,11 @@ class Program
 		var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
 		ga.Termination = new GenerationNumberTermination(100);
 
-		Console.WriteLine("GA running...");
+		Console.WriteLine("GA running...\n");
 		ga.Start();
 
-		Console.WriteLine($"Best solution found has {ga.BestChromosome.Fitness} fitness.");
+		Console.WriteLine($"Best solution found has {ga.BestChromosome.Fitness/1.0*100}% fitness with {fitness.EvaluatePenaltyPoints(ga.BestChromosome)} penalty points.\n");
+
 		var myChromosome = ga.BestChromosome as ScheduleChromosome;
 		Console.WriteLine(SolutionSerializer.SerializeGamesFromChromosome(myChromosome));
 		SolutionSerializer.SaveSolutionToFile(myChromosome, "D:/Dani/BME/felev_8/Onlab1/repo/Onlab_25/SportScheduler/Solutions", instance.MetaData.InstanceName, instance.MetaData.InstanceName+"_MySol");

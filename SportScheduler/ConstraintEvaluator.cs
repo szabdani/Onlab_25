@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,56 +39,204 @@ namespace SportScheduler
 		/// </summary>
 		public int EvaluateCA1(CA1 constraint, List<ScheduledMatch> matches)
 		{
+			int penalty = 0;
 			int numberOfGames = 0;
+
 			switch(constraint.Mode)
 			{
 				case "H":
-					numberOfGames = matches.Where(game => game.Home == constraint.Team).Count();
+					numberOfGames = matches.Where(game => game.Home == constraint.Team && constraint.Slots.Contains(game.Slot)).Count();
 					break;
 				case "A":
-					numberOfGames = matches.Where(game => game.Away == constraint.Team).Count();
+					numberOfGames = matches.Where(game => game.Away == constraint.Team && constraint.Slots.Contains(game.Slot)).Count();
 					break;
 				default:
 					throw new Exception("CA1 with wrong Mode");
 			}
 
-			int penalty = (numberOfGames - constraint.Max)*constraint.Penalty;
+			penalty = Math.Max(0, (numberOfGames - constraint.Max));
 
-			if(penalty < 0)
-				penalty = 0;
-
-			return penalty;
+			return penalty * constraint.Penalty;
 		}
 
+		/// <summary>
+		/// "Team1" plays at most "Max" games against "Teams2" in "Slots"
+		/// Mode1 = H -> Max Home games
+		/// Mode1 = A -> Max Away games
+		/// Mode1 = HA -> All games
+		/// Penalty given for each game that exceeds "Max"
+		/// </summary>
+		public int EvaluateCA2(CA2 constraint, List<ScheduledMatch> matches)
+		{
+			int penalty = 0;
+			int numberOfGames = 0;
 
-		public int EvaluateCA2(CA2 constraint)
+			int countH = matches.Where(game => game.Home == constraint.Team1 && constraint.Teams2.Contains(game.Away) && constraint.Slots.Contains(game.Slot)).Count();
+			int countA = matches.Where(game => game.Away == constraint.Team1 && constraint.Teams2.Contains(game.Home) && constraint.Slots.Contains(game.Slot)).Count();
+
+			switch (constraint.Mode1)
+			{
+				case "H":
+					numberOfGames = countH;
+					break;
+				case "A":
+					numberOfGames = countA; 
+					break;
+				case "HA":
+					numberOfGames = countA + countH;
+					break;
+				default:
+					throw new Exception("CA2 with wrong Mode");
+			}
+
+			penalty = Math.Max(0, (numberOfGames - constraint.Max));
+
+			return penalty * constraint.Penalty;
+		}
+
+		/// <summary>
+		/// Each team in "Teams1" plays at most "Max" games out of "intp" against "Teams2"
+		/// Mode1 = H -> Max Home games
+		/// Mode1 = A -> Max Away games
+		/// Mode1 = HA -> All games
+		/// Penalty is the sum of the games that exceed "Max" for each "Teams1"
+		/// </summary>
+		public int EvaluateCA3(CA3 constraint, List<ScheduledMatch> matches)
+		{
+			// Chat
+			throw new NotImplementedException();
+		}
+
+		/// <summary>
+		// "Teams1" plays at most "Max" games against "Teams2 as a whole"
+		/// Mode1 = H -> Max Home games
+		/// Mode1 = A -> Max Away games
+		/// Mode1 = HA -> All games
+		/// Mode2 = GLOBAL -> During "Slots"
+		/// Mode2 = EVERY -> During each slot in "Slots"
+		/// Penalty is given for each game that exceeds "Max"
+		/// </summary>
+		public int EvaluateCA4(CA4 constraint, List<ScheduledMatch> matches)
 		{
 			throw new NotImplementedException();
 		}
 
-		public int EvaluateCA3(CA3 constraint)
+		/// <summary>
+		/// Meeting:= Game between Team A and B - (a,b)
+		/// At least "Min" and at most "Max" "Meetings" happen in "Slots"
+		/// Penalty is given for the number of games that fail the interval 
+		/// </summary>
+		public int EvaluateGA1(GA1 constraint, List<ScheduledMatch> matches)
 		{
-			throw new NotImplementedException();
+			int penalty = 0;
+			int count = 0;
+
+			foreach(var meeting in constraint.Meetings)
+			{
+				var match = matches.First(m => meeting.Item1 == m.Home && meeting.Item2 == m.Away);
+				if(constraint.Slots.Contains(match.Slot))
+					count++;
+			}
+
+			if (count < constraint.Min) penalty = constraint.Min - count;
+			if (count > constraint.Max) penalty = count - constraint.Max;
+
+			return penalty * constraint.Penalty;
 		}
 
-		public int EvaluateCA4(CA4 constraint)
+		/// <summary>
+		/// Break:= If a team plays the same home-away status as previously
+		/// "Team" has at most "intp" breaks
+		/// Mode2 = H -> Max Home games
+		/// Mode2 = A -> Max Away games
+		/// Mode2 = HA -> All games
+		/// Penalty is given for each break over "intp"
+		/// </summary>
+		public int EvaluateBR1(BR1 constraint, List<ScheduledMatch> matches)
 		{
-			throw new NotImplementedException();
+			int penalty = 0;
+			int count = 0;
+
+			var teamMatches = matches
+				.Where(m => m.Home == constraint.Team || m.Away == constraint.Team)
+				.OrderBy(m => m.Slot)
+				.ToList();
+
+			for (int i = 1; i < teamMatches.Count; i++)
+			{
+				var prev = teamMatches[i - 1];
+				var curr = teamMatches[i];
+
+				if (!constraint.Slots.Contains(curr.Slot))
+					continue;
+
+				// check for a break
+				bool isHomePrev = prev.Home == constraint.Team;
+				bool isHomeCurr = curr.Home == constraint.Team;
+				bool isAwayPrev = prev.Away == constraint.Team;
+				bool isAwayCurr = curr.Away == constraint.Team;
+
+				bool isBreak = false;
+
+				if (constraint.Mode2 == "H" && isHomePrev && isHomeCurr)
+					isBreak = true;
+				else if (constraint.Mode2 == "A" && isAwayPrev && isAwayCurr)
+					isBreak = true;
+				else if (constraint.Mode2 == "HA" && ((isHomePrev && isHomeCurr) || (isAwayPrev && isAwayCurr)))
+					isBreak = true;
+
+				if (isBreak)
+					count++;
+			}
+
+			if (count > constraint.Intp)
+				penalty = count - constraint.Intp;
+
+			return penalty * constraint.Penalty;
 		}
 
-		public int EvaluateGA1(GA1 constraint)
-		{
-			throw new NotImplementedException();
-		}
 
-		public int EvaluateBR1(BR1 constraint)
+		/// <summary>
+		/// Break:= If a team plays the same home-away status as previously
+		/// The sum of breaks of all "Teams" is less than or equal to "intp"
+		/// Penalty is given for each break over "intp"
+		/// <summary>
+		public int EvaluateBR2(BR2 constraint, List<ScheduledMatch> matches)
 		{
-			throw new NotImplementedException();
-		}
+			int penalty = 0;
+			int totalBreaks = 0;
 
-		public int EvaluateBR2(BR2 constraint)
-		{
-			throw new NotImplementedException();
+			foreach (int team in constraint.Teams)
+			{
+				// Get all matches involving the team, ordered by slot
+				var teamMatches = matches
+					.Where(m => m.Home == team || m.Away == team)
+					.OrderBy(m => m.Slot)
+					.ToList();
+
+				// Check for breaks
+				for (int i = 1; i < teamMatches.Count; i++)
+				{
+					var prev = teamMatches[i - 1];
+					var curr = teamMatches[i];
+
+					// Only check if current match is in a relevant slot
+					if (!constraint.Slots.Contains(curr.Slot))
+						continue;
+
+					bool isPrevHome = prev.Home == team;
+					bool isCurrHome = curr.Home == team;
+
+					// Break = same location twice in a row (home-home or away-away)
+					if ((isPrevHome && isCurrHome) || (!isPrevHome && !isCurrHome))
+						totalBreaks++;
+				}
+			}
+
+			if(totalBreaks > constraint.Intp)
+				penalty = totalBreaks - constraint.Intp;
+
+			return penalty * constraint.Penalty;
 		}
 
 		/// <summary>
@@ -96,7 +245,6 @@ namespace SportScheduler
 		/// </summary>
 		public int EvaluateSE1(SE1 constraint, List<ScheduledMatch> matches)
 		{
-			int numberOfGames = 0;
 			int penalty = 0;
 
 			// Iterate over all pairs of teams
@@ -114,14 +262,14 @@ namespace SportScheduler
 						.ToList();
 
 					// Calculate penalty for this specific pair of teams
-					penalty += CalculatePenaltyForTeamPair(teamMatches, constraint.Min);
+					penalty += CalculateSE1ByPairs(teamMatches, constraint.Min);
 				}
 			}
 
 			return penalty * constraint.Penalty;
 		}
 
-		private int CalculatePenaltyForTeamPair(List<ScheduledMatch> teamMatches, int minSlots)
+		private int CalculateSE1ByPairs(List<ScheduledMatch> teamMatches, int minSlots)
 		{
 			int penalty = 0;
 
@@ -145,9 +293,51 @@ namespace SportScheduler
 			return penalty;
 		}
 
-		public int EvaluateFA2(FA2 constraint)
+		/// <summary>
+		/// Each pairing of "Teams" has a difference in home games less than or equal to "intp" after each "slot"
+		/// Penalty is given for the largest difference between home games over "intp" for each team pairing
+		/// </summary>
+		public int EvaluateFA2(FA2 constraint, List<ScheduledMatch> matches)
 		{
-			throw new NotImplementedException();
+			int penalty = 0;
+			int maxSlot = constraint.Slots.Count;
+
+			// key: teamId, value: array of length = maxSlot + 1
+			Dictionary<int, int[]> homeGameCounts = new(); 
+
+			// Initialize
+			foreach (int teamId in constraint.Teams)
+				homeGameCounts[teamId] = new int[maxSlot + 1];
+
+			foreach (var match in matches)
+			{
+				if (homeGameCounts.ContainsKey(match.Home))
+				{
+					for (int s = match.Slot; s <= maxSlot; s++)
+						homeGameCounts[match.Home][s]++;
+				}
+			}
+
+			// Check the differences for each slot
+			foreach (int slot in constraint.Slots)
+			{
+				foreach (int i in constraint.Teams)
+				{
+					foreach (int j in constraint.Teams)
+					{
+						// Skip non-unique pairings
+						if (i >= j) continue;
+
+						int diff = Math.Abs(homeGameCounts[i][slot] - homeGameCounts[j][slot]);
+						if (diff > constraint.Intp)
+						{
+							penalty += diff - constraint.Intp;
+						}
+					}
+				}
+			}
+
+			return penalty * constraint.Penalty;
 		}
 	}
 }

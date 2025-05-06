@@ -66,6 +66,7 @@ namespace SportScheduler
 			{
 				for (int j = i + 1; j < numberOfTeams; j++)
 				{
+					// Slot not yet picked
 					_matchList.Add(new ScheduledMatch(i, j, -1));
 					_matchList.Add(new ScheduledMatch(j, i, -1));
 				}

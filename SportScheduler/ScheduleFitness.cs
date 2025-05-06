@@ -21,6 +21,12 @@ namespace SportScheduler
 
 		public double Evaluate(IChromosome chromosome)
 		{
+			// Invert penalty to fit GeneticSharp's maximization
+			return 1.0 / (1 + EvaluatePenaltyPoints(chromosome));
+		}
+
+		public double EvaluatePenaltyPoints(IChromosome chromosome)
+		{
 			var myChromosome = chromosome as ScheduleChromosome;
 			var evaluator = new ConstraintEvaluator();
 
@@ -28,7 +34,7 @@ namespace SportScheduler
 			bool hardConstraintBroken = false;
 			var matches = myChromosome.GetScheduledMatches();
 
-			if(evaluator.ViolatesTeamDoubleBooking(matches) )
+			if (evaluator.ViolatesTeamDoubleBooking(matches))
 				return hardConstraintPenalty;
 
 			// Apply penalties for each constraint
@@ -50,8 +56,7 @@ namespace SportScheduler
 				totalPenalty += penalty;
 			}
 
-			// Invert penalty to fit GeneticSharp's maximization
-			return 1.0 / (1 + totalPenalty);
+			return totalPenalty;
 		}
 	}
 }
