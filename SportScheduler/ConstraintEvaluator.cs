@@ -10,6 +10,27 @@ namespace SportScheduler
 	public class ConstraintEvaluator
 	{
 		/// <summary>
+		/// Returns if any teams plays twice during a slot
+		/// </summary>
+		public bool ViolatesTeamDoubleBooking(List<ScheduledMatch> matches)
+		{
+			var slotTeams = new Dictionary<int, HashSet<int>>();
+
+			foreach (var match in matches)
+			{
+				if (!slotTeams.ContainsKey(match.Slot))
+					slotTeams[match.Slot] = new HashSet<int>();
+
+				var teamsInSlot = slotTeams[match.Slot];
+				if (!teamsInSlot.Add(match.Home) || !teamsInSlot.Add(match.Away))
+					return true; // Team already scheduled in this slot
+			}
+
+			return false;
+		}
+
+
+		/// <summary>
 		/// "Team" plays at most "Max" games in "Slots"
 		/// Mode = H -> Max Home games
 		/// Mode = A -> Max Away games
@@ -30,7 +51,7 @@ namespace SportScheduler
 					throw new Exception("CA1 with wrong Mode");
 			}
 
-			int penalty = (constraint.Max-numberOfGames)*constraint.Penalty;
+			int penalty = (numberOfGames - constraint.Max)*constraint.Penalty;
 
 			if(penalty < 0)
 				penalty = 0;
@@ -97,7 +118,7 @@ namespace SportScheduler
 				}
 			}
 
-			return penalty;
+			return penalty * constraint.Penalty;
 		}
 
 		private int CalculatePenaltyForTeamPair(List<ScheduledMatch> teamMatches, int minSlots)

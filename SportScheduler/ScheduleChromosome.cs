@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GeneticSharp;
 using SportScheduler.Models;
@@ -15,21 +16,23 @@ namespace SportScheduler
 		/// <summary>
 		/// Possible values: 16, 18, 20
 		/// </summary>
-		private static int numberOfTeams = 16;
+		private static int numberOfTeams;
 
 		/// <summary>
 		/// Number of matches
 		/// Because it is 2RR it willbe N*(N-1)
 		/// </summary>
 
-		private static int numberOfMatches = 16 * 15;
+		private static int numberOfMatches;
 
 		/// <summary>
 		/// How many rounds there are
 		/// Possible values: 30, 34, 38
 		/// Because it's always 2RR
 		/// </summary>
-		private static int numberOfSlots = 30;
+		private static int numberOfSlots;
+
+		private static int numberOfMatchesPerSlot;
 
 		/// <summary>
 		/// Phased if the games are split into to 1RRs in the middle of the season
@@ -39,7 +42,7 @@ namespace SportScheduler
 		/// <summary>
 		/// Precomputed list of all directed matches (home != away).
 		/// </summary>
-		private readonly List<(int Home, int Away)> _matchList;
+		private static List<ScheduledMatch> _matchList;
 
 		public static void SetInstance(Instance instance)
 		{
@@ -47,6 +50,7 @@ namespace SportScheduler
 			numberOfTeams = instance.Resources.Teams.Count;
 			numberOfMatches = numberOfTeams * (numberOfTeams - 1);
 			numberOfSlots = instance.Resources.Slots.Count;
+			numberOfMatchesPerSlot = numberOfMatches / numberOfSlots;
 			isPhased = instance.Structure.Format.GameMode.Equals("P");
 		}
 
@@ -56,14 +60,14 @@ namespace SportScheduler
 		/// </summary>
 		public ScheduleChromosome() : base(numberOfMatches)
 		{
-			// Build all ordered pairs (i,j) with i != j
-			_matchList = new List<(int, int)>(numberOfMatches);
+			// Build all matches
+			_matchList = new List<ScheduledMatch>(numberOfMatches);
 			for (int i = 0; i < numberOfTeams; i++)
 			{
-				for (int j = 0; j < numberOfTeams; j++)
+				for (int j = i + 1; j < numberOfTeams; j++)
 				{
-					if (i == j) continue;
-					_matchList.Add((i, j));
+					_matchList.Add(new ScheduledMatch(i, j, -1));
+					_matchList.Add(new ScheduledMatch(j, i, -1));
 				}
 			}
 
@@ -72,13 +76,52 @@ namespace SportScheduler
 		}
 
 		/// <summary>
+		/// Creates Genes so that no team plays twice in the same slot
+		/// </summary>
+		protected override void CreateGenes()
+		{
+			var remainingMatches = new List<ScheduledMatch>(_matchList);
+			var genes = new List<Gene>();
+
+			for (int slot = 0; slot < numberOfSlots; slot++)
+			{
+				var slotMatches = new List<ScheduledMatch>();
+				var teamsUsed = new HashSet<int>();
+				var rand = new Random();
+
+				// Fill each slot so that no team plays twice
+				while (slotMatches.Count < numberOfMatchesPerSlot && remainingMatches.Count > 0)
+				{
+					var match = remainingMatches[rand.Next(remainingMatches.Count)];
+
+					if (!teamsUsed.Contains(match.Home) && !teamsUsed.Contains(match.Away))
+					{
+						match.Slot = slot;
+						slotMatches.Add(match);
+						teamsUsed.Add(match.Home);
+						teamsUsed.Add(match.Away);
+						remainingMatches.Remove(match);
+					}
+				}
+
+				// Add to genes
+				foreach (var match in slotMatches)
+					genes.Add(new Gene(match));
+			}
+
+			ReplaceGenes(0, genes.ToArray());
+		}
+
+		/// <summary>
 		/// Called by GeneticSharp to create an initial random gene at position index.
 		/// We simply pick a random slot for that match.
 		/// </summary>
 		public override Gene GenerateGene(int index)
 		{
-			var slot = RandomizationProvider.Current.GetInt(0, numberOfSlots);
-			return new Gene(slot);
+			// var slot = RandomizationProvider.Current.GetInt(0, numberOfSlots);
+			// return new Gene(slot);
+
+			throw new NotImplementedException("Use CreateGenes() to generate valid genes.");
 		}
 
 		/// <summary>
@@ -95,9 +138,7 @@ namespace SportScheduler
 		/// </summary>
 		public ScheduledMatch GetScheduledMatch(int geneIndex)
 		{
-			var (home, away) = _matchList[geneIndex];
-			var slot = (int)GetGene(geneIndex).Value;
-			return new ScheduledMatch(home, away, slot);
+			return (ScheduledMatch)GetGene(geneIndex).Value;
 		}
 
 		/// <summary>

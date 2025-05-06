@@ -23,12 +23,12 @@ class Program
 		Console.WriteLine("Loaded instance: " + instance.MetaData.InstanceName);
 		ScheduleChromosome.SetInstance(instance);
 
-		var selection = new EliteSelection();
-		var crossover = new UniformCrossover();
+		var selection = new TournamentSelection(4);
+		var crossover = new OnePointCrossover();
 		var mutation = new ReverseSequenceMutation();
 		var fitness = new ScheduleFitness(instance);
 		var chromosome = new ScheduleChromosome();
-		var population = new Population(50, 70, chromosome);
+		var population = new Population(1000, 2000, chromosome);
 
 		var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
 		ga.Termination = new GenerationNumberTermination(100);

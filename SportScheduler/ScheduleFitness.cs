@@ -12,7 +12,7 @@ namespace SportScheduler
 	public class ScheduleFitness : IFitness
 	{
 		private Instance instance;
-		private int hardConstraintMultiplier = 100;
+		private double hardConstraintPenalty = 0;
 
 		public ScheduleFitness(Instance instance)
 		{
@@ -28,36 +28,30 @@ namespace SportScheduler
 			bool hardConstraintBroken = false;
 			var matches = myChromosome.GetScheduledMatches();
 
+			if(evaluator.ViolatesTeamDoubleBooking(matches) )
+				return hardConstraintPenalty;
+
 			// Apply penalties for each constraint
 			foreach (var constraint in instance.Constraints.CapacityConstraints.CA1s)
 			{
 				int penalty = evaluator.EvaluateCA1(constraint, matches);
-
 				if (constraint.Type == "HARD" && penalty > 0)
-				{
-					hardConstraintBroken = true;
-					penalty *= hardConstraintMultiplier;
-				}
-					
+					return hardConstraintPenalty;
+
 				totalPenalty += penalty;
 			}
 
 			foreach (var constraint in instance.Constraints.SeparationConstraints.SE1s)
 			{
 				int penalty = evaluator.EvaluateSE1(constraint, matches);
-
 				if (constraint.Type == "HARD" && penalty > 0)
-				{
-					return double.MaxValue;
-				}
+					return hardConstraintPenalty;
 
 				totalPenalty += penalty;
 			}
 
-			if (hardConstraintBroken) Console.WriteLine("At least one HARD constraint is broken.");
-
 			// Invert penalty to fit GeneticSharp's maximization
-			return 1.0 / (1.0 + totalPenalty);
+			return 1.0 / (1 + totalPenalty);
 		}
 	}
 }
