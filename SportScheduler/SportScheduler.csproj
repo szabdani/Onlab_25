@@ -20,4 +20,8 @@
     <PackageReference Include="GeneticSharp" Version="3.1.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Solutions\" />
+  </ItemGroup>
+
 </Project>

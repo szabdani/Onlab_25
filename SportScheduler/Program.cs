@@ -7,8 +7,7 @@ class Program
 {
 	static void Main()
 	{
-
-		string fileName = "ITC2021_Test8.xml";
+		string fileName = "TestInstanceDemo.xml";
 		string path = Path.Combine("D:/Dani/BME/felev_8/Onlab1/repo/Onlab_25/SportScheduler/Instances", "TestInstances_V3" , fileName);
 
 		if (!File.Exists(path))
@@ -22,13 +21,13 @@ class Program
 		var instance = (Instance)serializer.Deserialize(reader);
 
 		Console.WriteLine("Loaded instance: " + instance.MetaData.InstanceName);
-		ScheduleChoromosome.SetInstance(instance);
+		ScheduleChromosome.SetInstance(instance);
 
 		var selection = new EliteSelection();
-		var crossover = new OrderedCrossover();
+		var crossover = new UniformCrossover();
 		var mutation = new ReverseSequenceMutation();
 		var fitness = new ScheduleFitness(instance);
-		var chromosome = new ScheduleChoromosome();
+		var chromosome = new ScheduleChromosome();
 		var population = new Population(50, 70, chromosome);
 
 		var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
@@ -37,7 +36,10 @@ class Program
 		Console.WriteLine("GA running...");
 		ga.Start();
 
-		Console.WriteLine($"Best solution found has {0} fitness.", ga.BestChromosome.Fitness);
+		Console.WriteLine($"Best solution found has {ga.BestChromosome.Fitness} fitness.");
+		var myChromosome = ga.BestChromosome as ScheduleChromosome;
+		Console.WriteLine(SolutionSerializer.SerializeGamesFromChromosome(myChromosome));
+		SolutionSerializer.SaveSolutionToFile(myChromosome, "D:/Dani/BME/felev_8/Onlab1/repo/Onlab_25/SportScheduler/Solutions", instance.MetaData.InstanceName, instance.MetaData.InstanceName+"_MySol");
 	}
 }
 
