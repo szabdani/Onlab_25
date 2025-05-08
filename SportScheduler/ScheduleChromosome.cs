@@ -32,6 +32,10 @@ namespace SportScheduler
 		/// </summary>
 		private static int numberOfSlots;
 
+		/// <summary>
+		/// How many matches are played in each slot
+		/// Possible values: 8, 9, 10
+		/// </summary>
 		private static int numberOfMatchesPerSlot;
 
 		/// <summary>
@@ -81,35 +85,32 @@ namespace SportScheduler
 		/// </summary>
 		protected override void CreateGenes()
 		{
-			var remainingMatches = new List<ScheduledMatch>(_matchList);
 			var genes = new List<Gene>();
 
-			for (int slot = 0; slot < numberOfSlots; slot++)
+			int rounds = numberOfTeams - 1;
+
+			for (int round = 0; round < rounds; round++)
 			{
-				var slotMatches = new List<ScheduledMatch>();
-				var teamsUsed = new HashSet<int>();
-				var rand = new Random();
-
-				// Fill each slot so that no team plays twice
-				while (slotMatches.Count < numberOfMatchesPerSlot && remainingMatches.Count > 0)
+				for (int i = 0; i < numberOfTeams / 2; i++)
 				{
-					var match = remainingMatches[rand.Next(remainingMatches.Count)];
+					int teamA = (round + i) % (numberOfTeams - 1);
+					int teamB = (numberOfTeams - 1 - i + round) % (numberOfTeams - 1);
+					if (i == 0)
+						teamB = numberOfTeams - 1;
 
-					if (!teamsUsed.Contains(match.Home) && !teamsUsed.Contains(match.Away))
-					{
-						match.Slot = slot;
-						slotMatches.Add(match);
-						teamsUsed.Add(match.Home);
-						teamsUsed.Add(match.Away);
-						remainingMatches.Remove(match);
-					}
-				}
-
-				// Add to genes
-				foreach (var match in slotMatches)
+					// First half: assign (teamA vs teamB) to round
+					var match = _matchList.FirstOrDefault(m => m.Home == teamA && m.Away == teamB);
+					if (match != null)
+						match.Slot = round;
 					genes.Add(new Gene(match));
-			}
 
+					// Second half: assign (teamB vs teamA) to round + rounds
+					var reverseMatch = _matchList.FirstOrDefault(m => m.Home == teamB && m.Away == teamA);
+					if (reverseMatch != null)
+						reverseMatch.Slot = round + rounds;
+					genes.Add(new Gene(reverseMatch));
+				}
+			}
 			ReplaceGenes(0, genes.ToArray());
 		}
 
