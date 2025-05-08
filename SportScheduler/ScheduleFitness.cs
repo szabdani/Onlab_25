@@ -12,7 +12,7 @@ namespace SportScheduler
 	public class ScheduleFitness : IFitness
 	{
 		private Instance instance;
-		private double hardConstraintPenalty = 10000;
+		private double hardConstraintPenalty = 1000;
 
 		public ScheduleFitness(Instance instance)
 		{

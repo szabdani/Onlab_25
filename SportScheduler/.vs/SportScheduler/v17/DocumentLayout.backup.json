@@ -7,16 +7,16 @@
       "RelativeMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|d:\\dani\\bme\\felev_8\\onlab1\\repo\\onlab_25\\sportscheduler\\schedulefitness.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|solutionrelative:schedulefitness.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|d:\\dani\\bme\\felev_8\\onlab1\\repo\\onlab_25\\sportscheduler\\constraintevaluator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|solutionrelative:constraintevaluator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|d:\\dani\\bme\\felev_8\\onlab1\\repo\\onlab_25\\sportscheduler\\schedulechromosome.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|solutionrelative:schedulechromosome.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|d:\\dani\\bme\\felev_8\\onlab1\\repo\\onlab_25\\sportscheduler\\schedulefitness.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|solutionrelative:schedulefitness.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|d:\\dani\\bme\\felev_8\\onlab1\\repo\\onlab_25\\sportscheduler\\solutions\\test instance 1_mysol.xml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
@@ -33,10 +33,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|d:\\dani\\bme\\felev_8\\onlab1\\repo\\onlab_25\\sportscheduler\\instances\\testinstances_v3\\testinstancedemo.xml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
       "RelativeMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|solutionrelative:instances\\testinstances_v3\\testinstancedemo.xml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|d:\\dani\\bme\\felev_8\\onlab1\\repo\\onlab_25\\sportscheduler\\solutions\\test instance demo_mysol.xml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|solutionrelative:solutions\\test instance demo_mysol.xml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{3A21034B-C7DB-40B1-AF8D-75AFF87DBF07}|SportScheduler.csproj|d:\\dani\\bme\\felev_8\\onlab1\\repo\\onlab_25\\sportscheduler\\instances\\testinstances_v3\\itc2021_test7.xml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
@@ -60,7 +56,7 @@
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "D:\\Dani\\BME\\felev_8\\Onlab1\\repo\\Onlab_25\\SportScheduler\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAkAAAAAAAAAA==",
+              "ViewState": "AgIAABoAAAAAAAAAAAAQwDUAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-27T13:28:29.627Z",
               "IsPinned": true,
@@ -68,13 +64,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "ScheduleFitness.cs",
               "DocumentMoniker": "D:\\Dani\\BME\\felev_8\\Onlab1\\repo\\Onlab_25\\SportScheduler\\ScheduleFitness.cs",
               "RelativeDocumentMoniker": "ScheduleFitness.cs",
               "ToolTip": "D:\\Dani\\BME\\felev_8\\Onlab1\\repo\\Onlab_25\\SportScheduler\\ScheduleFitness.cs",
               "RelativeToolTip": "ScheduleFitness.cs",
-              "ViewState": "AgIAABIAAAAAAAAAAAAqwBsAAAAPAAAAAAAAAA==",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAAC4AAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-08T12:08:37.48Z",
               "IsPinned": true,
@@ -82,13 +78,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "ConstraintEvaluator.cs",
               "DocumentMoniker": "D:\\Dani\\BME\\felev_8\\Onlab1\\repo\\Onlab_25\\SportScheduler\\ConstraintEvaluator.cs",
               "RelativeDocumentMoniker": "ConstraintEvaluator.cs",
               "ToolTip": "D:\\Dani\\BME\\felev_8\\Onlab1\\repo\\Onlab_25\\SportScheduler\\ConstraintEvaluator.cs",
               "RelativeToolTip": "ConstraintEvaluator.cs",
-              "ViewState": "AgIAAB8AAAAAAAAAAAAgwBMAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABwAAAAAAAAAAAAgwBMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-14T21:00:39.801Z",
               "IsPinned": true,
@@ -96,13 +92,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "ScheduleChromosome.cs",
               "DocumentMoniker": "D:\\Dani\\BME\\felev_8\\Onlab1\\repo\\Onlab_25\\SportScheduler\\ScheduleChromosome.cs",
               "RelativeDocumentMoniker": "ScheduleChromosome.cs",
               "ToolTip": "D:\\Dani\\BME\\felev_8\\Onlab1\\repo\\Onlab_25\\SportScheduler\\ScheduleChromosome.cs",
               "RelativeToolTip": "ScheduleChromosome.cs",
-              "ViewState": "AgIAAFsAAAAAAAAAAAAAAHAAAAAEAAAAAAAAAA==",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAUwG0AAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-14T18:19:37.033Z",
               "IsPinned": true,
@@ -118,8 +114,7 @@
               "RelativeToolTip": "Instances\\TestInstances_V3\\ITC2021_Test1.xml",
               "ViewState": "AgIAAFMAAAAAAAAAAAAuwHUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003576|",
-              "WhenOpened": "2025-05-08T11:58:55.674Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-08T11:58:55.674Z"
             },
             {
               "$type": "Document",
@@ -131,12 +126,11 @@
               "RelativeToolTip": "Solutions\\Test Instance 1_MySol.xml",
               "ViewState": "AgIAAAYAAAAAAAAAAAAuwBkAAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003576|",
-              "WhenOpened": "2025-05-08T11:58:22.093Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-08T11:58:22.093Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 8,
               "Title": "ITC2021_Test7.xml",
               "DocumentMoniker": "D:\\Dani\\BME\\felev_8\\Onlab1\\repo\\Onlab_25\\SportScheduler\\Instances\\TestInstances_V3\\ITC2021_Test7.xml",
               "RelativeDocumentMoniker": "Instances\\TestInstances_V3\\ITC2021_Test7.xml",
@@ -156,21 +150,7 @@
               "RelativeToolTip": "Instances\\TestInstances_V3\\ITC2021_Test5.xml",
               "ViewState": "AgIAAHsAAAAAAAAAAAAAAIgAAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003576|",
-              "WhenOpened": "2025-05-06T14:21:52.154Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "Test Instance Demo_MySol.xml",
-              "DocumentMoniker": "D:\\Dani\\BME\\felev_8\\Onlab1\\repo\\Onlab_25\\SportScheduler\\Solutions\\Test Instance Demo_MySol.xml",
-              "RelativeDocumentMoniker": "Solutions\\Test Instance Demo_MySol.xml",
-              "ToolTip": "D:\\Dani\\BME\\felev_8\\Onlab1\\repo\\Onlab_25\\SportScheduler\\Solutions\\Test Instance Demo_MySol.xml",
-              "RelativeToolTip": "Solutions\\Test Instance Demo_MySol.xml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAxAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003576|",
-              "WhenOpened": "2025-05-06T13:16:43.055Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-06T14:21:52.154Z"
             },
             {
               "$type": "Document",
@@ -182,8 +162,7 @@
               "RelativeToolTip": "Instances\\TestInstances_V3\\TestInstanceDemo.xml",
               "ViewState": "AgIAAB8AAAAAAAAAAAAgwDsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003576|",
-              "WhenOpened": "2025-05-06T10:06:15.782Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-06T10:06:15.782Z"
             }
           ]
         }
