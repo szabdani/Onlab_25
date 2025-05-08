@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SportScheduler.Models;
 
@@ -101,10 +102,47 @@ namespace SportScheduler
 		/// Mode1 = HA -> All games
 		/// Penalty is the sum of the games that exceed "Max" for each "Teams1"
 		/// </summary>
-		public int EvaluateCA3(CA3 constraint, List<ScheduledMatch> matches)
+		public int EvaluateCA3(CA3 constraint, List<ScheduledMatch> matches, int numberOfSlots)
 		{
-			// Chat
-			throw new NotImplementedException();
+			int penalty = 0;
+
+			foreach (int team1 in constraint.Teams1)
+			{
+				var homeMatches = matches.Where(game => game.Home == team1 && constraint.Teams2.Contains(game.Away));
+				var awayMatches = matches.Where(game => game.Away == team1 && constraint.Teams2.Contains(game.Home));
+
+				// Iterate over all possible sliding windows of size intp
+				for (int startSlot = 0; startSlot <= numberOfSlots - constraint.Intp; startSlot++)
+				{
+					int endSlot = startSlot + constraint.Intp - 1;
+					int numberOfGames = 0;
+
+					int countH = homeMatches.Where(game => game.Slot >= startSlot && game.Slot <= endSlot).Count();
+					int countA = awayMatches.Where(game => game.Slot >= startSlot && game.Slot <= endSlot).Count();
+
+					switch (constraint.Mode1)
+					{
+						case "H":
+							numberOfGames = countH;
+							break;
+						case "A":
+							numberOfGames = countA;
+							break;
+						case "HA":
+							numberOfGames = countA + countH;
+							break;
+						default:
+							throw new Exception("CA3 with wrong Mode");
+					}
+
+					if (numberOfGames > constraint.Max)
+					{
+						penalty += numberOfGames - constraint.Max;
+					}
+				}
+			}
+
+			return penalty * constraint.Penalty;
 		}
 
 		/// <summary>
@@ -118,7 +156,48 @@ namespace SportScheduler
 		/// </summary>
 		public int EvaluateCA4(CA4 constraint, List<ScheduledMatch> matches)
 		{
-			throw new NotImplementedException();
+			int penalty = 0;
+
+			// Filter matches that are in the relevant time slots
+			var matchesInSlots = matches.Where(m => constraint.Slots.Contains(m.Slot)).ToList();
+			var homeMatches = matchesInSlots.Where(game => constraint.Teams1.Contains(game.Home) && constraint.Teams2.Contains(game.Away)).ToList();
+			var awayMatches = matchesInSlots.Where(game => constraint.Teams1.Contains(game.Away) && constraint.Teams2.Contains(game.Home)).ToList();
+			List<ScheduledMatch> relevantMatches = new List <ScheduledMatch>();
+
+			switch (constraint.Mode1)
+			{
+				case "H":
+					relevantMatches = homeMatches;
+					break;
+				case "A":
+					relevantMatches = awayMatches;
+					break;
+				case "HA":
+					relevantMatches = homeMatches.Concat(awayMatches).ToList();
+					break;
+				default:
+					throw new Exception("CA4 with wrong Mode1");
+			}
+
+			int count = 0;
+			switch (constraint.Mode2)
+			{
+				case "GLOBAL":
+					count = relevantMatches.Count();
+					penalty = Math.Max(0, count - constraint.Max);
+					break;
+				case "EVERY":
+					foreach (var slot in constraint.Slots)
+					{
+						count = relevantMatches.Where(m => m.Slot == slot).Count();
+						penalty += Math.Max(0, count - constraint.Max);
+					}
+					break;
+				default:
+					throw new Exception("CA4 with wrong Mode2");
+			}
+
+			return penalty * constraint.Penalty;
 		}
 
 		/// <summary>
