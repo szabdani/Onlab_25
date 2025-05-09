@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SportScheduler")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1cdefa525c9803ccd8517e9479a58931ea3a7a11")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f0ba90633f175d520015d95baa9959e6e35b01bd")]
 [assembly: System.Reflection.AssemblyProductAttribute("SportScheduler")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SportScheduler")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

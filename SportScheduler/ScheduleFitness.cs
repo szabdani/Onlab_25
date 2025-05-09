@@ -13,6 +13,7 @@ namespace SportScheduler
 	{
 		private Instance instance;
 		private int hardConstraintPenaltyMultiplier = 1000;
+		private int formatPenaltyMultiplier = 10000;
 
 		public ScheduleFitness(Instance instance)
 		{
@@ -37,6 +38,10 @@ namespace SportScheduler
 			int softPenalty = 0;
 			int hardPenalty = 0;
 			var matches = myChromosome.GetScheduledMatches();
+
+			// Apply penalties for violating the double round robin format
+			totalPenalty += CalculateFormatPenalties(matches)* formatPenaltyMultiplier;
+			Console.WriteLine($"Format penalties: {totalPenalty}");
 
 			// Apply penalties for each constraint
 			foreach (var constraint in instance.Constraints.CapacityConstraints.CA1s)
@@ -175,6 +180,96 @@ namespace SportScheduler
 			}
 
 			return (totalPenalty, hardPenalty, softPenalty);
+		}
+
+		public int CalculateFormatPenalties(List<ScheduledMatch> schedule)
+		{
+			int totalPenalty = 0;
+
+			var slotGroups = schedule.GroupBy(m => m.Slot)
+									 .ToDictionary(g => g.Key, g => g.ToList());
+
+			// Violation 1: Duplicate Matches (Same Home-Away Pairing)
+			totalPenalty += CalculateDuplicateMatchPenalties(schedule);
+
+			// Violation 2: Team Playing More Than Once in a Slot
+			totalPenalty += CalculateTeamInSlotPenalties(slotGroups);
+
+			// Violation 3: Number of Matches per Slot Exceeds Limit
+			totalPenalty += CalculateSlotOverloadPenalties(slotGroups);
+
+			return totalPenalty;
+		}
+
+		// Violation 1: Duplicate Matches (Same Home-Away Pairing)
+		private int CalculateDuplicateMatchPenalties(List<ScheduledMatch> schedule)
+		{
+			int penalty = 0;
+			List<ScheduledMatch> newSchedule = new List<ScheduledMatch>();
+
+			foreach (var match in schedule)
+			{
+				if (newSchedule.FirstOrDefault(m => m.Home == match.Home && m.Away == match.Away) is not null)
+				{
+					// Duplicate match found
+					penalty++;
+				}
+				else
+				{
+					newSchedule.Add(match);
+				}
+			}
+
+			return penalty;
+		}
+
+		// Violation 2: Team Playing More Than Once in a Slot
+		private int CalculateTeamInSlotPenalties(Dictionary<int, List<ScheduledMatch>> slotGroups)
+		{
+			int penalty = 0;
+
+			foreach (var slot in slotGroups.Values)
+			{
+				var teamsInSlot = new HashSet<int>();
+
+				foreach (var match in slot)
+				{
+					// Check if the team already plays in the slot
+					if (teamsInSlot.Contains(match.Home) || teamsInSlot.Contains(match.Away))
+					{
+						// Team playing more than once in the slot
+						penalty++;
+					}
+					else
+					{
+						teamsInSlot.Add(match.Home);
+						teamsInSlot.Add(match.Away);
+					}
+				}
+			}
+
+			return penalty;
+		}
+
+		// Violation 3: Number of Matches is not the same for all Slots
+		private int CalculateSlotOverloadPenalties(Dictionary<int, List<ScheduledMatch>> slotGroups)
+		{
+			int penalty = 0;
+			int numberOfMatches = instance.Resources.Teams.Count * (instance.Resources.Teams.Count - 1);
+			int numberOfMatchesPerSlot = numberOfMatches / instance.Resources.Slots.Count;
+
+			foreach (var slot in slotGroups.Values)
+			{
+				if (slot.Count > numberOfMatchesPerSlot)
+				{
+					penalty += (slot.Count - numberOfMatchesPerSlot);
+				}
+				else if(slot.Count < numberOfMatchesPerSlot)
+				{
+					penalty += (numberOfMatchesPerSlot - slot.Count);
+				}
+			}
+			return penalty;
 		}
 	}
 }
