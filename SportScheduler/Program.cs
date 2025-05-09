@@ -51,7 +51,7 @@ class Program
 			var population = new Population(1000, 2000, chromosome);
 
 			var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
-			ga.Termination = new GenerationNumberTermination(30);
+			ga.Termination = new GenerationNumberTermination(10);
 
 			Console.WriteLine("Genetic Algorithm running...\n");
 			ga.Start();

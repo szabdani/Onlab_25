@@ -41,7 +41,6 @@ namespace SportScheduler
 
 			// Apply penalties for violating the double round robin format
 			totalPenalty += CalculateFormatPenalties(matches)* formatPenaltyMultiplier;
-			Console.WriteLine($"Format penalties: {totalPenalty}");
 
 			// Apply penalties for each constraint
 			foreach (var constraint in instance.Constraints.CapacityConstraints.CA1s)
