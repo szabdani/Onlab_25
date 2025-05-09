@@ -51,31 +51,27 @@ class Program
 			var population = new Population(1000, 2000, chromosome);
 
 			var ga = new GeneticAlgorithm(population, fitness, selection, crossover, mutation);
-			ga.Termination = new GenerationNumberTermination(100);
+			ga.Termination = new GenerationNumberTermination(30);
 
-			Console.WriteLine("GA running...\n");
+			Console.WriteLine("Genetic Algorithm running...\n");
 			ga.Start();
-
-			Console.WriteLine($"Best solution found has {ga.BestChromosome.Fitness / 1.0 * 100}% fitness with {fitness.EvaluatePenaltyPoints(ga.BestChromosome)} penalty points.\n");
-
-			/*
-			 * (double, int, int) penalties = fitness.EvaluatePenaltyPoints(ga.BestChromosome);
+			
+			(int, int, int) penalties = fitness.EvaluatePenaltyPoints(ga.BestChromosome);
 			Console.WriteLine($"Best solution found has {ga.BestChromosome.Fitness/1.0*100}% fitness with\n" +
 				$"Total Penalties: {penalties.Item1}\n" +
 				$"Hard Penalties: {penalties.Item2}\n" +
 				$"Soft Penalties: {penalties.Item3}\n");
-			 */
 
 			var myChromosome = ga.BestChromosome as ScheduleChromosome;
 			Console.WriteLine(SolutionSerializer.SerializeGamesFromChromosome(myChromosome));
 			SolutionSerializer.SaveSolutionToFile(myChromosome, "D:/Dani/BME/felev_8/Onlab1/repo/Onlab_25/SportScheduler/Solutions", instance.MetaData.InstanceName, instance.MetaData.InstanceName + "_MySol");
 			
-			// Ask user if they want to solve another instance
+			// Ask for next instance
 			Console.WriteLine("Would you like to solve another instance? (y/n): ");
 			string continueInput = Console.ReadLine()?.Trim().ToLower();
 			if (continueInput != "y")
 			{
-				break;  // Exit the loop if user doesn't want to continue
+				break;
 			}
 		}
 		Console.WriteLine("Exiting program...");

@@ -22,7 +22,6 @@ namespace SportScheduler
 		/// Number of matches
 		/// Because it is 2RR it willbe N*(N-1)
 		/// </summary>
-
 		private static int numberOfMatches;
 
 		/// <summary>
@@ -44,7 +43,7 @@ namespace SportScheduler
 		private static bool isPhased = false;
 
 		/// <summary>
-		/// Precomputed list of all directed matches (home != away).
+		/// Precomputed list of all matches (home != away) without slots.
 		/// </summary>
 		private static List<ScheduledMatch> _matchList;
 
@@ -136,14 +135,6 @@ namespace SportScheduler
 		}
 
 		/// <summary>
-		/// Helper: get the scheduled match for gene i.
-		/// </summary>
-		public ScheduledMatch GetScheduledMatch(int geneIndex)
-		{
-			return (ScheduledMatch)GetGene(geneIndex).Value;
-		}
-
-		/// <summary>
 		/// Helper: get the matches of the chromosome.
 		/// </summary>
 		public List<ScheduledMatch> GetScheduledMatches()
@@ -152,7 +143,7 @@ namespace SportScheduler
 
 			for (int i = 0; i < Length; i++)
 			{
-				scheduledMatches.Add(GetScheduledMatch(i));
+				scheduledMatches.Add((ScheduledMatch)GetGene(i).Value);
 			}
 
 			return scheduledMatches;

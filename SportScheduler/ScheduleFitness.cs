@@ -12,7 +12,7 @@ namespace SportScheduler
 	public class ScheduleFitness : IFitness
 	{
 		private Instance instance;
-		private double hardConstraintPenalty = 1000;
+		private int hardConstraintPenaltyMultiplier = 1000;
 
 		public ScheduleFitness(Instance instance)
 		{
@@ -21,11 +21,11 @@ namespace SportScheduler
 
 		public double Evaluate(IChromosome chromosome)
 		{
+			(int, int, int) penalties = EvaluatePenaltyPoints(chromosome);
 			// Invert penalty to fit GeneticSharp's maximization
-			return 1.0 / (1 + EvaluatePenaltyPoints(chromosome));
+			return 1.0 / (1 + EvaluatePenaltyPoints(chromosome).Item1);
 		}
-
-		public double EvaluatePenaltyPoints(IChromosome chromosome)
+		public (int, int, int) EvaluatePenaltyPoints(IChromosome chromosome)
 		{
 			if (chromosome is not ScheduleChromosome)
 				throw new ArgumentException("Chromosome must be a ScheduleChromosome");
@@ -34,94 +34,147 @@ namespace SportScheduler
 			var evaluator = new ConstraintEvaluator();
 
 			int totalPenalty = 0;
+			int softPenalty = 0;
+			int hardPenalty = 0;
 			var matches = myChromosome.GetScheduledMatches();
-
-			if (evaluator.ViolatesTeamDoubleBooking(matches))
-				return hardConstraintPenalty;
 
 			// Apply penalties for each constraint
 			foreach (var constraint in instance.Constraints.CapacityConstraints.CA1s)
 			{
 				int penalty = evaluator.EvaluateCA1(constraint, matches);
-				if (constraint.Type == "HARD" && penalty > 0)
-					return hardConstraintPenalty;
-
-				totalPenalty += penalty;
+				if (constraint.Type == "HARD")
+				{
+					hardPenalty += penalty;
+					totalPenalty += penalty * hardConstraintPenaltyMultiplier;
+				}
+				else if((constraint.Type == "SOFT"))
+				{
+					softPenalty += penalty;
+					totalPenalty += penalty;
+				}
 			}
 
 			foreach (var constraint in instance.Constraints.CapacityConstraints.CA2s)
 			{
 				int penalty = evaluator.EvaluateCA2(constraint, matches);
-				if (constraint.Type == "HARD" && penalty > 0)
-					return hardConstraintPenalty;
-
-				totalPenalty += penalty;
+				if (constraint.Type == "HARD")
+				{
+					hardPenalty += penalty;
+					totalPenalty += penalty * hardConstraintPenaltyMultiplier;
+				}
+				else if ((constraint.Type == "SOFT"))
+				{
+					softPenalty += penalty;
+					totalPenalty += penalty;
+				}
 			}
 
 			foreach (var constraint in instance.Constraints.CapacityConstraints.CA3s)
 			{
 				int penalty = evaluator.EvaluateCA3(constraint, matches, instance.Resources.Slots.Count);
-				if (constraint.Type == "HARD" && penalty > 0)
-					return hardConstraintPenalty;
-
-				totalPenalty += penalty;
+				if (constraint.Type == "HARD")
+				{
+					hardPenalty += penalty;
+					totalPenalty += penalty * hardConstraintPenaltyMultiplier;
+				}
+				else if ((constraint.Type == "SOFT"))
+				{
+					softPenalty += penalty;
+					totalPenalty += penalty;
+				}
 			}
 
 			foreach (var constraint in instance.Constraints.CapacityConstraints.CA4s)
 			{
 				int penalty = evaluator.EvaluateCA4(constraint, matches);
-				if (constraint.Type == "HARD" && penalty > 0)
-					return hardConstraintPenalty;
-
-				totalPenalty += penalty;
+				if (constraint.Type == "HARD")
+				{
+					hardPenalty += penalty;
+					totalPenalty += penalty * hardConstraintPenaltyMultiplier;
+				}
+				else if ((constraint.Type == "SOFT"))
+				{
+					softPenalty += penalty;
+					totalPenalty += penalty;
+				}
 			}
 
 			foreach (var constraint in instance.Constraints.GameConstraints.GA1s)
 			{
 				int penalty = evaluator.EvaluateGA1(constraint, matches);
-				if (constraint.Type == "HARD" && penalty > 0)
-					return hardConstraintPenalty;
-
-				totalPenalty += penalty;
+				if (constraint.Type == "HARD")
+				{
+					hardPenalty += penalty;
+					totalPenalty += penalty * hardConstraintPenaltyMultiplier;
+				}
+				else if ((constraint.Type == "SOFT"))
+				{
+					softPenalty += penalty;
+					totalPenalty += penalty;
+				}
 			}
 
 			foreach (var constraint in instance.Constraints.BreakConstraints.BR1s)
 			{
 				int penalty = evaluator.EvaluateBR1(constraint, matches);
-				if (constraint.Type == "HARD" && penalty > 0)
-					return hardConstraintPenalty;
-
-				totalPenalty += penalty;
+				if (constraint.Type == "HARD")
+				{
+					hardPenalty += penalty;
+					totalPenalty += penalty * hardConstraintPenaltyMultiplier;
+				}
+				else if ((constraint.Type == "SOFT"))
+				{
+					softPenalty += penalty;
+					totalPenalty += penalty;
+				}
 			}
 
 			foreach (var constraint in instance.Constraints.BreakConstraints.BR2s)
 			{
 				int penalty = evaluator.EvaluateBR2(constraint, matches);
-				if (constraint.Type == "HARD" && penalty > 0)
-					return hardConstraintPenalty;
-
-				totalPenalty += penalty;
+				if (constraint.Type == "HARD")
+				{
+					hardPenalty += penalty;
+					totalPenalty += penalty * hardConstraintPenaltyMultiplier;
+				}
+				else if ((constraint.Type == "SOFT"))
+				{
+					softPenalty += penalty;
+					totalPenalty += penalty;
+				}
 			}
 
 			foreach (var constraint in instance.Constraints.FairnessConstraints.FA2s)
 			{
 				int penalty = evaluator.EvaluateFA2(constraint, matches);
-				if (constraint.Type == "HARD" && penalty > 0)
-					return hardConstraintPenalty;
-
-				totalPenalty += penalty;
+				if (constraint.Type == "HARD")
+				{
+					hardPenalty += penalty;
+					totalPenalty += penalty * hardConstraintPenaltyMultiplier;
+				}
+				else if ((constraint.Type == "SOFT"))
+				{
+					softPenalty += penalty;
+					totalPenalty += penalty;
+				}
 			}
 
 			foreach (var constraint in instance.Constraints.SeparationConstraints.SE1s)
 			{
 				int penalty = evaluator.EvaluateSE1(constraint, matches);
-				if (constraint.Type == "HARD" && penalty > 0)
-					return hardConstraintPenalty;
-
-				totalPenalty += penalty;
+				if (constraint.Type == "HARD")
+				{
+					hardPenalty += penalty;
+					totalPenalty += penalty * hardConstraintPenaltyMultiplier;
+				}
+				else if ((constraint.Type == "SOFT"))
+				{
+					softPenalty += penalty;
+					totalPenalty += penalty;
+				}
 			}
 
-			return totalPenalty;
+			return (totalPenalty, hardPenalty, softPenalty);
 		}
 	}
 }

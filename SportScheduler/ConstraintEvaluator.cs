@@ -12,27 +12,6 @@ namespace SportScheduler
 	public class ConstraintEvaluator
 	{
 		/// <summary>
-		/// Returns if any teams plays twice during a slot
-		/// </summary>
-		public bool ViolatesTeamDoubleBooking(List<ScheduledMatch> matches)
-		{
-			var slotTeams = new Dictionary<int, HashSet<int>>();
-
-			foreach (var match in matches)
-			{
-				if (!slotTeams.ContainsKey(match.Slot))
-					slotTeams[match.Slot] = new HashSet<int>();
-
-				var teamsInSlot = slotTeams[match.Slot];
-				if (!teamsInSlot.Add(match.Home) || !teamsInSlot.Add(match.Away))
-					return true; // Team already scheduled in this slot
-			}
-
-			return false;
-		}
-
-
-		/// <summary>
 		/// "Team" plays at most "Max" games in "Slots"
 		/// Mode = H -> Max Home games
 		/// Mode = A -> Max Away games
@@ -212,8 +191,8 @@ namespace SportScheduler
 
 			foreach(var meeting in constraint.Meetings)
 			{
-				var match = matches.First(m => meeting.Item1 == m.Home && meeting.Item2 == m.Away);
-				if(constraint.Slots.Contains(match.Slot))
+				var match = matches.FirstOrDefault(m => meeting.Item1 == m.Home && meeting.Item2 == m.Away);
+				if(match is not null && constraint.Slots.Contains(match.Slot))
 					count++;
 			}
 
