@@ -327,24 +327,17 @@ namespace SportScheduler
 			return penalty * constraint.Penalty;
 		}
 
-		private int CalculateSE1ByPairs(List<ScheduledMatch> teamMatches, int minSlots)
+		private int CalculateSE1ByPairs(List<ScheduledMatch> matches, int minSeparation)
 		{
 			int penalty = 0;
 
-			// Iterate through the sorted matches to check for consecutive violations
-			for (int i = 1; i < teamMatches.Count; i++)
+			for (int i = 1; i < matches.Count; i++)
 			{
-				var currentMatch = teamMatches[i];
-				var previousMatch = teamMatches[i - 1];
-
-				// Calculate the number of slots between consecutive games
-				int slotsBetween = currentMatch.Slot - previousMatch.Slot;
-
-				// If the slots between the matches are less than the required 'min', apply the penalty
-				if (slotsBetween < minSlots)
+				int diff = matches[i].Slot - matches[i - 1].Slot;
+				if (diff <= minSeparation)
 				{
-					// Add penalty for the violation
-					penalty += (minSlots - slotsBetween);
+					// + 1 So that it counts the current slot as well
+					penalty += (minSeparation + 1 - diff);
 				}
 			}
 
@@ -357,45 +350,53 @@ namespace SportScheduler
 		/// </summary>
 		public int EvaluateFA2(FA2 constraint, List<ScheduledMatch> matches)
 		{
-			int penalty = 0;
-			int maxSlot = constraint.Slots.Count;
+			var teams = constraint.Teams;
+			var slots = constraint.Slots.OrderBy(s => s).ToList();
+			int intp = constraint.Intp;
 
-			// key: teamId, value: array of length = maxSlot + 1
-			Dictionary<int, int[]> homeGameCounts = new(); 
+			// Initialize home game counts per team per slot
+			var homeGames = new Dictionary<int, List<int>>();
+			foreach (var team in teams)
+				homeGames[team] = new List<int>();
 
-			// Initialize
-			foreach (int teamId in constraint.Teams)
-				homeGameCounts[teamId] = new int[maxSlot + 1];
-
-			foreach (var match in matches)
+			// Track cumulative home games over time
+			foreach (var slot in slots)
 			{
-				if (homeGameCounts.ContainsKey(match.Home))
+				var slotMatches = matches.Where(m => m.Slot == slot).ToList();
+				foreach (var team in teams)
 				{
-					for (int s = match.Slot; s <= maxSlot; s++)
-						homeGameCounts[match.Home][s]++;
+					int previous = homeGames[team].Count > 0 ? homeGames[team].Last() : 0;
+					int isHome = slotMatches.Any(m => m.Home == team) ? 1 : 0;
+					homeGames[team].Add(previous + isHome);
 				}
 			}
 
-			// Check the differences for each slot
-			foreach (int slot in constraint.Slots)
-			{
-				foreach (int i in constraint.Teams)
-				{
-					foreach (int j in constraint.Teams)
-					{
-						// Skip non-unique pairings
-						if (i >= j) continue;
+			int penalty = 0;
 
-						int diff = Math.Abs(homeGameCounts[i][slot] - homeGameCounts[j][slot]);
-						if (diff > constraint.Intp)
-						{
-							penalty += diff - constraint.Intp;
-						}
+			// For each pair, calculate the max violation over all slots
+			for (int i = 0; i < teams.Count; i++)
+			{
+				for (int j = i + 1; j < teams.Count; j++)
+				{
+					int teamA = teams[i];
+					int teamB = teams[j];
+					int maxDiff = 0;
+
+					for (int s = 0; s < slots.Count; s++)
+					{
+						int diff = Math.Abs(homeGames[teamA][s] - homeGames[teamB][s]);
+						if (diff > maxDiff)
+							maxDiff = diff;
 					}
+
+					int violation = maxDiff - intp;
+					if (violation > 0)
+						penalty += violation;
 				}
 			}
 
 			return penalty * constraint.Penalty;
 		}
+
 	}
 }
